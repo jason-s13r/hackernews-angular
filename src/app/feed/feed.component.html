@@ -1,0 +1,17 @@
+<div class="feed">
+	<div class="centered">
+		<mat-button-toggle-group [value]="sorting" name="Sorting" aria-label="Sorting">
+			<mat-button-toggle value="new" routerLink="/feed/new">New</mat-button-toggle>
+			<mat-button-toggle value="top" routerLink="/feed/top">Top</mat-button-toggle>
+			<mat-button-toggle value="best" routerLink="/feed/best">Best</mat-button-toggle>
+		</mat-button-toggle-group>
+	</div>
+
+	<mat-progress-bar [value]="feed?.length ?? 0" [bufferValue]="ids?.length ?? 0" mode="determinate" *ngIf="!feed || (ids && feed.length < ids.length)"></mat-progress-bar>
+	
+	<div class="feed-list" *ngIf="feed">
+		<app-feed-item *ngFor="let item of feed" [id]="item.id"></app-feed-item>
+	</div>
+
+	<mat-progress-bar [value]="feed?.length ?? 0" [bufferValue]="ids?.length ?? 0" mode="determinate" *ngIf="!feed || (ids && feed.length < ids.length)"></mat-progress-bar>
+</div>

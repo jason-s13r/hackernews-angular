@@ -1,0 +1,20 @@
+.comment-list {
+  padding-left: 0.5rem;
+  margin: 0.5rem 0 0.5rem 0.25rem;
+  border-left: solid 0.25rem #888;
+}
+
+.comment-progress {
+  margin: 1rem 0;
+}
+.comment-children {
+  margin: 1rem 0;
+}
+
+.plain-link {
+  color: inherit;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}

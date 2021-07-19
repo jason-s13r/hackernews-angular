@@ -1,0 +1,28 @@
+.reader-page {
+  max-width: 60rem;
+  margin: 1rem auto;
+
+  .centered {
+    text-align: center;
+  }
+
+  > * {
+    margin: 1rem 0;
+  }
+}
+
+.plain-link {
+  color: inherit;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.readable-content {
+  figure,
+  img,
+  video {
+    max-width: 100% !important;
+  }
+}

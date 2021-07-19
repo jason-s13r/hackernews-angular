@@ -1,0 +1,47 @@
+<div *ngIf="item">
+
+	<mat-card *ngIf="!item.deleted">
+		<mat-card-subtitle>
+			{{item.score ?? 0}} points
+			{{item.type}} by <a target="_blank" class="plain-link" [href]="item.authorLink">{{item.by}}</a>
+			{{' '}}
+			<a class="plain-link" [href]="item.link" target="_blank">
+				<app-time [date]="item.time * 1000"></app-time>
+			</a>
+		</mat-card-subtitle>
+		<mat-card-content>
+			<div [innerHtml]="item.text"></div>
+		</mat-card-content>
+		<mat-card-actions>
+			<button *ngIf="!loadingComments && item?.kids?.length" color="primary" mat-flat-button (click)="loadComments()">Load {{ item.kids.length }} comments</button>
+			<button *ngIf="!showComments && comments?.length" color="primary" mat-flat-button (click)="toggleComments()">Show {{ item.kids.length }} comments</button>
+			<button *ngIf="showComments && comments?.length" color="primary" mat-stroked-button (click)="toggleComments()">Hide {{ item.kids.length }} comments</button>
+		</mat-card-actions>		
+	</mat-card>
+
+	<mat-card *ngIf="item.deleted">
+		<mat-card-subtitle>
+			{{item.score ?? 0}} points
+			{{item.type}} by [deleted] {{' '}}
+			<app-time [date]="item.time * 1000"></app-time>
+			
+		</mat-card-subtitle>
+		<mat-card-content>
+			<em>[removed]</em>
+		</mat-card-content>
+		<mat-card-actions>
+			<button *ngIf="!loadingComments && item?.kids?.length" color="primary" mat-flat-button (click)="loadComments()">Load {{ item.kids.length }} comments</button>
+			<button *ngIf="!showComments && comments?.length" color="primary" mat-flat-button (click)="toggleComments()">Show {{ item.kids.length }} comments</button>
+			<button *ngIf="showComments && comments?.length" color="primary" mat-stroked-button (click)="toggleComments()">Hide {{ item.kids.length }} comments</button>
+		</mat-card-actions>
+	</mat-card>
+
+	<mat-progress-bar class="comment-progress" [value]="comments?.length ?? 0" [bufferValue]="item?.kids?.length ?? 0" mode="determinate" *ngIf="loadingComments && showComments && (item.kids?.length ?? 0) > (comments?.length ?? 0)"></mat-progress-bar>
+
+	<div class="comment-list" *ngIf="showComments && comments && comments.length">
+		<div class="comment-children" *ngFor="let comment of comments">
+			<app-comment [id]="comment.id" [depth]="depth + 1"></app-comment>
+		</div>
+	</div>
+
+</div>

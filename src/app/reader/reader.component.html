@@ -1,0 +1,41 @@
+<div class="reader-page" *ngIf="item">
+	<a mat-raised-button (click)="back()">Back</a>
+	
+	<mat-card>
+		<mat-card-title>{{item.title}}</mat-card-title>	
+		<mat-card-subtitle>
+			{{item.score ?? 0}} points
+			{{item.type}} by <a target="_blank" class="plain-link" [href]="item.authorLink">{{item.by}}</a>
+			{{' '}}
+			<a class="plain-link" [href]="item.link" target="_blank">
+				<app-time [date]="item.time * 1000"></app-time>
+			</a>
+		</mat-card-subtitle>
+		<mat-card-actions>
+			<a mat-button target="_blank" [href]="item.url">view article</a>
+			<a mat-button target="_blank" [href]="item.link">hackernews</a>
+			<a mat-button routerLink="/comments/{{item.id}}">comments ({{ item.kids?.length ?? 0 }})</a>
+		</mat-card-actions>	
+	</mat-card>
+
+	<mat-progress-bar mode="indeterminate" *ngIf="!readable"></mat-progress-bar>
+
+	<mat-card *ngIf="readable">
+		<mat-card-title>{{readable.title}}</mat-card-title>	
+		<mat-card-subtitle>
+			<div>
+				<a target="_blank" class="plain-link" [href]="readable.url">{{readable.url}}</a>
+			</div>
+			<div>
+				<a target="_blank" class="plain-link" [href]="readable.authorLink">{{readable.author}}</a>
+			</div>
+		</mat-card-subtitle>
+		<mat-card-content>
+			<div class="readable-content" [innerHtml]="readable.content"></div>
+		</mat-card-content>
+	</mat-card>
+
+	<div class="centered">
+		Powered by <a href="https://declutter.1j.nz" target="_blank">Declutter</a>
+	</div>
+</div>

@@ -1,0 +1,14 @@
+.feed {
+  max-width: 60rem;
+  margin: 1rem auto;
+
+  .centered {
+    text-align: center;
+  }
+
+  .centered,
+  .feed-list > *,
+  .placeholder > * {
+    margin: 1rem;
+  }
+}
