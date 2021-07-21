@@ -1,7 +1,9 @@
 <div>
 	<mat-card *ngIf="item">
 		<mat-card-title>
-			<a class="plain-link" routerLink="/reader/{{item.id}}">{{item.title}}</a></mat-card-title>	
+			<a class="plain-link" *ngIf="item.url" routerLink="/reader/{{item.id}}">{{item.title}}</a>
+			<a class="plain-link" *ngIf="!item.url" routerLink="/comments/{{item.id}}">{{item.title}}</a>
+		</mat-card-title>
 		<mat-card-subtitle>
 			{{item.score}} points
 			{{item.type}} by <a target="_blank" class="plain-link" [href]="item.authorLink">{{item.by}}</a>
@@ -9,12 +11,13 @@
 			<a [href]="item.link" class="plain-link" target="_blank">
 				<app-time [date]="item.time * 1000"></app-time>
 			</a>
+			from <a class="plain-link" [href]="item.url || item.link" target="_blank">{{ item.host }}</a>
 		</mat-card-subtitle>
 		<mat-card-actions>
-			<a mat-button target="_blank" [href]="item.url">view article</a>
 			<a mat-button target="_blank" [href]="item.link">hackernews</a>
+			<a mat-button *ngIf="item.url" target="_blank" [href]="item.url">open link</a>
+			<a mat-button *ngIf="item.url" routerLink="/reader/{{item.id}}">reader mode</a>
 			<a mat-button routerLink="/comments/{{item.id}}">comments ({{ item.kids?.length ?? 0 }})</a>
-			<a mat-button routerLink="/reader/{{item.id}}">reader mode</a>
 		</mat-card-actions>	
 	</mat-card>
 </div>

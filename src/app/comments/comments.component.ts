@@ -47,7 +47,9 @@ export class CommentsComponent implements OnInit {
       });
 
       // pre-cache the readable.
-      this.declutter.getItem(item.url).subscribe((r) => (this.readable = r));
+      if (item.url) {
+        this.declutter.getItem(item.url).subscribe((r) => (this.readable = r));
+      }
     });
   }
 }

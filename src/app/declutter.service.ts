@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { differenceInHours } from 'date-fns';
+import { differenceInHours, differenceInSeconds } from 'date-fns';
 import * as localforage from 'localforage';
 import { from, Observable } from 'rxjs';
 import { concatMap, map, retry, tap } from 'rxjs/operators';
@@ -31,7 +31,7 @@ export class DeclutterService {
           return;
         }
         if (differenceInHours(new Date(), item.retrieved) > 6) {
-          console.log('removing old readable:', item.id);
+          console.log('removing old readable:', item.url);
           this.storage.removeItem(key);
         }
       });
@@ -43,13 +43,18 @@ export class DeclutterService {
       .pipe(retry(5))
       .pipe(
         map((readable: any) => {
-          readable.retrieved = new Date();
+          if (readable) {
+            readable.retrieved = new Date();
+          }
           return readable;
         })
       );
   }
 
-  getItem(url: string): Observable<any> {
+  getItem(url: string, cache: number = 3600): Observable<any> {
+    if (!url) {
+      return from([{ content: 'No Article', title: 'Error' }]);
+    }
     return new Observable((subscriber) => {
       this.storage
         .getItem(url.toString())
@@ -57,7 +62,7 @@ export class DeclutterService {
           if (!value) {
             throw new Error('not found in cache');
           }
-          if (differenceInHours(new Date(), value.retrieved) > 6) {
+          if (differenceInSeconds(new Date(), value.retrieved) > cache) {
             this.storage.removeItem(url.toString());
             throw new Error('cached item is too old');
           }
@@ -70,6 +75,12 @@ export class DeclutterService {
             subscriber.complete();
           });
         });
-    }).pipe(tap((i: any) => this.storage.setItem(i.url.toString(), i)));
+    }).pipe(
+      tap((i: any) => {
+        if (i) {
+          this.storage.setItem(i.url.toString(), i);
+        }
+      })
+    );
   }
 }

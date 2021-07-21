@@ -1,15 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {
-  concatMap,
-  delay,
-  map,
-  mergeMap,
-  retry,
-  retryWhen,
-  tap,
-  toArray,
-} from 'rxjs/operators';
+import { concatMap, delay, map, mergeMap, retry, tap } from 'rxjs/operators';
 import { from, Observable } from 'rxjs';
 import * as localforage from 'localforage';
 import { differenceInHours, differenceInSeconds } from 'date-fns';
@@ -83,16 +74,18 @@ export class HackerNewsService {
       .pipe(retry(5))
       .pipe(
         map((item: any) => {
-          item.authorLink = `https://news.ycombinator.com/user?id=${item.by}`;
-          item.link = `https://news.ycombinator.com/item?id=${item.id}`;
-          item.host = new URL(item.url || item.link).host;
-          item.retrieved = new Date();
+          if (item) {
+            item.authorLink = `https://news.ycombinator.com/user?id=${item.by}`;
+            item.link = `https://news.ycombinator.com/item?id=${item.id}`;
+            item.host = new URL(item.url || item.link).host;
+            item.retrieved = new Date();
+          }
           return item;
         })
       );
   }
 
-  getItem(id: string): Observable<any> {
+  getItem(id: string, cache: number = 300): Observable<any> {
     return new Observable((subscriber) => {
       this.storage
         .getItem(id.toString())
@@ -100,7 +93,7 @@ export class HackerNewsService {
           if (!value) {
             throw new Error('not found in cache');
           }
-          if (differenceInSeconds(new Date(), value.retrieved) > 300) {
+          if (differenceInSeconds(new Date(), value.retrieved) > cache) {
             this.storage.removeItem(id.toString());
             throw new Error('cached item is too old');
           }
@@ -113,7 +106,13 @@ export class HackerNewsService {
             subscriber.complete();
           });
         });
-    }).pipe(tap((i: any) => this.storage.setItem(i.id.toString(), i)));
+    }).pipe(
+      tap((i: any) => {
+        if (i) {
+          this.storage.setItem(i.id.toString(), i);
+        }
+      })
+    );
   }
 
   slowPreload(sorting: 'new' | 'best' | 'top'): Observable<any[]> {
@@ -123,7 +122,7 @@ export class HackerNewsService {
       .pipe(concatMap((id) => this.getItem(id)));
   }
 
-  getCommentItem(id: string): Observable<any> {
+  getCommentItem(id: string, cache: number = 300): Observable<any> {
     return new Observable((subscriber) => {
       this.commentStorage
         .getItem(id.toString())
@@ -131,11 +130,11 @@ export class HackerNewsService {
           if (!value) {
             throw new Error('not found in cache');
           }
-          if (differenceInSeconds(new Date(), value.retrieved) > 300) {
+          subscriber.next(value);
+          if (differenceInSeconds(new Date(), value.retrieved) > cache) {
             this.commentStorage.removeItem(id.toString());
             throw new Error('cached item is too old');
           }
-          subscriber.next(value);
           subscriber.complete();
         })
         .catch(() => {
@@ -144,7 +143,13 @@ export class HackerNewsService {
             subscriber.complete();
           });
         });
-    }).pipe(tap((i: any) => this.commentStorage.setItem(i.id.toString(), i)));
+    }).pipe(
+      tap((i: any) => {
+        if (i) {
+          this.commentStorage.setItem(i.id.toString(), i);
+        }
+      })
+    );
   }
 
   getComments(ids: string[] = []): Observable<any> {
